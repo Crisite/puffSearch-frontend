@@ -8,16 +8,16 @@
       @search="onSearch"
     />
     <mydivider />
-    {{ JSON.stringify(searchParams) }}
+    {{ JSON.stringify(userList) }}
     <a-tabs v-model:activeKey="activeKey" @change="onTableChange">
       <a-tab-pane key="post" tab="文章">
-        <PostList />
+        <PostList :post-list="postList" />
       </a-tab-pane>
       <a-tab-pane key="picture" tab="图片">
         <PictureList />
       </a-tab-pane>
       <a-tab-pane key="user" tab="用户">
-        <UserList />
+        <UserList :user-list="userList" />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -41,9 +41,15 @@ const initSearchParams = {
   pageSize: 10,
 };
 const searchParams = ref(initSearchParams);
+const postList = ref([]);
+const userList = ref([]);
 
-myAxios.get("/post/get/vo?id=" + "1679165821810872321").then((res) => {
-  console.log(res);
+myAxios.post("post/list/page/vo", {}).then((res: any) => {
+  postList.value = res.records;
+});
+myAxios.post("user/list/page/vo", {}).then((res: any) => {
+  console.error(res);
+  userList.value = res.records;
 });
 
 // 监听
