@@ -14,7 +14,7 @@
         <PostList :post-list="postList" />
       </a-tab-pane>
       <a-tab-pane key="picture" tab="图片">
-        <PictureList />
+        <PictureList :picture-list="pictureList" />
       </a-tab-pane>
       <a-tab-pane key="user" tab="用户">
         <UserList :user-list="userList" />
@@ -43,14 +43,28 @@ const initSearchParams = {
 const searchParams = ref(initSearchParams);
 const postList = ref([]);
 const userList = ref([]);
+const pictureList = ref([]);
 
-myAxios.post("post/list/page/vo", {}).then((res: any) => {
-  postList.value = res.records;
-});
-myAxios.post("user/list/page/vo", {}).then((res: any) => {
-  console.error(res);
-  userList.value = res.records;
-});
+/*
+ * 加载数据
+ * @param params
+ */
+const loadData = (params: any) => {
+  const query = {
+    ...params,
+    searchText: params.text,
+  };
+  console.error(params);
+  myAxios.post("search/all", query).then((res: any) => {
+    postList.value = res.postList;
+    pictureList.value = res.pictureList;
+    userList.value = res.userList;
+    console.error(pictureList.value);
+  });
+};
+
+// 首次请求
+// loadData(initSearchParams);
 
 // 监听
 watchEffect(() => {
@@ -64,6 +78,7 @@ const onSearch = (value: string) => {
   router.push({
     query: searchParams.value,
   });
+  loadData(searchParams.value);
 };
 
 const onTableChange = (key: string) => {
